@@ -1,0 +1,84 @@
+1)
+
+Lung Cancer -
+5 yes, 5 no, parent gini: 1 - (5/10)^2 - (5/10)^2 = 0.5
+
+Smoker -
+5 YES, 4 in yes, 1 in no: 1 - (4/5)^2 - (1/5)^2 = 0.320
+5 NO, 1 in yes, 4 in no: '' = 0.320
+Weighted: (0.5 * 0.320) + (0.5 * 0.320) = 0.320
+
+Radon Exposure -
+2 YES, 2 in yes, 0 in no: 1 - (2/2)^2 - (0/2)^2 = 0
+8 NO, 3 in yes, 5 in no: 1 - (3/8)^2 - (5/8)^2 = 0.469
+Weighted: (0.2 * 0) + (0.8 * 0.469) = 0.375
+
+Chronic Cough -
+7 YES, 4 in yes, 3 in no: 1 - (4/7)^2 - (3/7)^2 = 0.490
+3 NO, 1 in yes, 2 in no: 1 - (1/3)^2 - (2/3)^2 = 0.444
+Weighted: (0.7 * 0.490) + (0.3 * 0.444) = 0.476
+
+Weight Loss -
+5 YES, 3 in yes, 2 in no: 1 - (3/5)^2 - (2/5)^2 = 0.480
+5 NO, 2 in yes, 3 in no: 1 - (2/5)^2 - (3/5)^2 = 0.480
+Weighted: (0.5 * 0.480) + (0.5 * 0.480) = 0.480
+
+So split on Smoker as lowest Gini (0.320). Gini Gain would be 0.5 - 0.320 = 0.180
+
+2)
+
+target -
+8 C0, 8C1, parent gini: 1 - (8/16)^2 - (8/16)^2 = 0.5
+
+cartype -
+5 Family, 2 in C0, 3 in C1: 1 - (2/5)^2 - (3/5)^2 = 0.480
+3 Sports, 3 in C0, 0 in C1: 1 - (3/3)^2 - (0/3)^2 = 0
+8 Luxury, 3 in C0, 5 in C1: 1 - (3/8)^2 - (5/8)^2 = 0.469
+Weighted: (5/16 * 0.480) + (3/16 * 0) + (8/16 * 0.469) = 0.385
+
+shirtsize -
+4 Small, 2 in C0, 2 in C1: 1 - (0.5)^2 - (0.5)^2 = 0.5
+8 Medium, 4 in C0, 4 in C1: 1 - (0.5)^2 - (0.5)^2 = 0.5
+4 Large, 2 in C0, 2 in C1: 1 - (0.5)^2 - (0.5)^2 = 0.5
+Weighted: (4/16 * 0.5) + (8/16 * 0.5) + (4/16 * 0.5) = 0.5
+
+First split on cartype, then split on shirtsize.
+
+Accuracy = Correct/Total
+
+Sports Leaf: 3 C0 -> 3/3 correct
+Family Branch:  Small Leaf: 1 C0, 1 C1 -> 1/2 correct
+		Medium Leaf: 1 C0, 1 C1 -> 1/2 correct
+		Large Leaf: 1 C1 -> 1/1 correct
+Luxury Branch:  Small Leaf: 1 C0, 1 C1 -> 1/2 correct
+		Medium Leaf: 1 C0, 3 C1 -> 3/4 correct
+		Large Leaf: 1 C0, 1 C1 -> 1/2 correct
+
+Accuracy = 11/16 = 0.6875
+
+3) 
+
+Sample 5 has 3 same attributes, and has Yes, so we predict Yes.
+
+Jaccard = 1 - [ M11 / ( M01 + M10 + M11 ) ]
+	= 1 - [ 2 / ( 0 + 1 + 2 ) ] = 1 - 2/3 = 0.333
+
+4)
+
+Priors:
+25 Green, 25 Blue, so P(G) = 25+1/50+2 = 0.5 and P(B) = 25+1/50+2 = 0.5
+
+Conditionals:
+P(X=1|G) = (15+1)/(25+2) = 16/27
+P(Y=0|G) = (20+1)/(25+2) = 21/27
+P(Z=0|G) = (5+1)/(25+2) = 6/27
+
+P(X=1|B) = (10+1)/(25+2) = 11/27
+P(Y=0|B) = (15+1)/(25+2) = 16/27
+P(Z=0|B) = (0+1)/(25+2) = 1/27
+
+Score(Green) = P(G) * P(X=1|G) * P(Y=0|G) * P(Z=0|G) = 0.5 * 16/27 * 21/27 * 6/27 = 0.0512
+
+Score(Blue) = P(B) * P(X=1|B) * P(Y=0|B) * P(Z=0|B) = 0.5 * 11/27 * 16/27 * 1/27 = 0.00447
+
+Score(Green) is higher, so the colour is predicted to be Green.

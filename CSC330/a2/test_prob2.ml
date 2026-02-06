@@ -34,6 +34,34 @@ let testing () =
   in
   assert (get_strings t = [("table1", "hello"); ("table1", "x"); ("table1", "Y"); ("table2", "maybe")]);
   print_string ("get_strings test 1: passed\n");
+  
+  assert (is_uppercase "HELLO" = true);
+  print_string ("is_uppercase test 1: passed\n");
+  assert (is_uppercase "Hello" = false);
+  print_string ("is_uppercase test 2: passed\n");
+
+  assert (get_uppercase_strings_1 t = ["Y"]);
+  print_string ("get_uppercase_strings_1 test 1: passed\n");
+
+  assert (get_uppercase_strings_2 t = ["Y"]);
+  print_string ("get_uppercase_strings_2 test 1: passed\n");
+
+  let p = TablePattern [
+    "", StringPattern "hello";
+    "int", BindPattern "x";
+    "", TablePattern [ "", BindPattern "y"; "b", WildcardPattern ];
+    "", WildcardPattern ]
+  in
+  assert (omatch p (Table (snd @@ List.hd t)) = Some [("x", Int 5); ("y", Str "x")]);
+  print_string ("omatch test 1: passed\n");
+
+  let p = TablePattern [
+    "", StringPattern "hello";
+    "", BindPattern "x";
+    "", TablePattern [ "a", BindPattern "y"; "c", WildcardPattern ] ]
+  in
+  assert (omatch p (Table (snd @@ List.hd t)) = None);
+  print_string ("omatch test 2: passed\n");
   ()
 
 let _ = testing ()

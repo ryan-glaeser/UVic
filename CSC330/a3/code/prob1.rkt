@@ -1,20 +1,42 @@
 #lang racket
 
-
+;; CSC 330, Assignment 3, Problem 1
+;; Ryan Glaeser
+;; V00832892
 
 ;; ====================================== Answers ======================================
 
 ; 1.1: TODO
-(define stream-for-n-steps #f)
+(define (stream-for-n-steps s n)
+  (if (= n 0)
+      null
+      (let ([next (s)])
+        (cons (car next) 
+              (stream-for-n-steps (cdr next) (- n 1))))))
+
 
 ; 1.2: TODO
-(define fibo-stream #f)
+(define fibo-stream
+  (letrec ([f (lambda (curr next) (cons curr (lambda () (f next (+ curr next)))))]) 
+  (lambda () (f 0 1))))
 
 ; 1.3: TODO
-(define filter-stream #f)
+(define (filter-stream f s)
+  (lambda ()
+    (let ([next (s)])
+      (if (f (car next))
+          (cons (car next) (filter-stream f (cdr next)))
+          ((filter-stream f (cdr next)))))))
+    
 
 ; 1.4: TODO
-(define create-stream #f) ; replace define with macro definition
+(define-syntax create-stream
+  (syntax-rules (using starting at with increment)
+    [(create-stream name using f starting at i0 with increment delta)
+      (define name
+        (letrec ([gen (lambda (x)
+          (cons (f x) (lambda () (gen (+ x delta)))))])
+          (lambda () (gen i0))))]))
 
 
 

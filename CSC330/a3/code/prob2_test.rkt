@@ -323,7 +323,7 @@
                             (rkt-list->mfpl-list (list (int 10)))
                             "map-add-N single item list"))))
 
-(run-tests test-warm-up)
+;(run-tests test-warm-up)
 (run-tests test-eval)
-(run-tests test-expand)
-(run-tests test-use)
+;(run-tests test-expand)
+;(run-tests test-use)

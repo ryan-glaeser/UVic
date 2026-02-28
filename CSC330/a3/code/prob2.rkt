@@ -27,12 +27,19 @@
 ;; ====================================== Answers ======================================
 
 ; 2.1: TODO
-(define (mfpl-list->rkt-list lst)
-  #f)
+(define (rkt-list->mfpl-list lst)
+  (cond [(null? lst) (aunit)]
+        [(list? lst) 
+         (apair (rkt-list->mfpl-list (car lst)) 
+                (rkt-list->mfpl-list (cdr lst)))]
+        [#t lst]))
 
 ; 2.2: TODO
-(define (rkt-list->mfpl-list lst)
-  #f)
+(define (mfpl-list->rkt-list lst)
+  (cond [(aunit? lst) null]
+        [(apair? lst)
+          (cons (mfpl-list->rkt-list (apair-e1 lst)) (mfpl-list->rkt-list (apair-e2 lst)))]
+        [#t lst]))
 
 ; 2.3
 ;; Lookup a variable in an environment
@@ -58,6 +65,50 @@
     ; TODO
     ; add more cases here
     ; one for each type of expression
+    [(int? e) e]
+    [(aunit? e) e]
+    [(closure? e) e]
+    [(apair? e)
+     (apair (eval-under-env (apair-e1 e) env)
+            (eval-under-env (apair-e2 e) env))]
+    [(if>? e)
+     (let ([v1 (eval-under-env (if>-e1 e) env)]
+           [v2 (eval-under-env (if>-e2 e) env)])
+       (if (and (int? v1) (int? v2))
+           (if (> (int-num v1) (int-num v2))
+               (eval-under-env (if>-e3 e) env)
+               (eval-under-env (if>-e4 e) env))
+           (error "MF/PL if> applied to non-numbers")))]
+    [(call? e)
+     (let ([v1 (eval-under-env (call-funexp e) env)]
+           [v2 (eval-under-env (call-actual e) env)])
+       (if (closure? v1)
+           (let* ([f (closure-fun v1)]
+                  [c-env (closure-env v1)]
+                  [base-env (cons (cons (fun-formal f) v2) c-env)]
+                  [final-env (if (fun-nameopt f)
+                                 (cons (cons (fun-nameopt f) v1) base-env)
+                                 base-env)])
+             (eval-under-env (fun-body f) final-env))
+           (error "MF/PL call applied to non-closure")))]
+    [(mlet? e)
+     (let ([v (eval-under-env (mlet-e e) env)])
+       (eval-under-env (mlet-body e) (cons (cons (mlet-var e) v) env)))]
+    [(fun? e) (closure env e)]
+    [(fst? e)
+     (let ([v (eval-under-env (fst-e e) env)])
+       (if (apair? v)
+           (apair-e1 v)
+           (error "MF/PL fst applied to non-pair")))]
+    [(snd? e)
+     (let ([v (eval-under-env (snd-e e) env)])
+       (if (apair? v)
+           (apair-e2 v)
+           (error "MF/PL snd applied to non-pair")))]
+    [(isaunit? e)
+     (if (aunit? (eval-under-env (isaunit-e e) env))
+         (int 1)
+         (int 0))]
     [#t (error (format "bad MF/PL expression: ~v" e))]))
 
 ;; Do NOT change (modify eval-under-env instead!)

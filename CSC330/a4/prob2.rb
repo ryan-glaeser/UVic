@@ -119,6 +119,17 @@ class Point < GeometryValue
   end
 
   ## TODO: *add* methods to this class -- do *not* change given code and do not override any methods
+  def preprocess_prog
+    self
+  end
+
+  def eval_prog(env)
+    self
+  end
+
+  def shift(dx, dy)
+    Point.new(@x + dx, @y + dy)
+  end
 end
 
 class Line < GeometryValue
@@ -130,6 +141,17 @@ class Line < GeometryValue
   end
 
   ## TODO: *add* methods to this class -- do *not* change given code and do not override any methods
+  def preprocess_prog
+    self
+  end
+
+  def eval_prog(env)
+    self
+  end
+
+  def shift(dx, dy)
+    Line.new(@m, @b + dy - @m * dx)
+  end
 end
 
 class VerticalLine < GeometryValue
@@ -140,6 +162,17 @@ class VerticalLine < GeometryValue
   end
 
   ## TODO: *add* methods to this class -- do *not* change given code and do not override any methods
+  def preprocess_prog
+    self
+  end
+
+  def eval_prog(env)
+    self
+  end
+
+  def shift(dx, dy)
+    VerticalLine.new(@x + dx)
+  end
 end
 
 class LineSegment < GeometryValue
@@ -156,6 +189,27 @@ class LineSegment < GeometryValue
   end
 
   ## TODO: *add* methods to this class -- do *not* change given code and do not override any methods
+  def preprocess_prog
+    if real_close_point(@x1, @y1, @x2, @y2)
+      Point.new(@x1, @y1)
+    elsif real_close(@x1, @x2) && @y1 < @y2
+      LineSegment.new(@x2, @y2, @x1, @y1)
+    elsif real_close(@y1, @y2) && @x1 < @x2
+      LineSegment.new(@x2, @y2, @x1, @y1)
+    elsif @x1 < @x2 && @y1 < @y2
+      LineSegment.new(@x2, @y2, @x1, @y1)
+    else
+      self
+    end
+  end
+
+  def eval_prog(env)
+    self
+  end
+
+  def shift(dx, dy)
+    LineSegment.new(@x1 + dx, @y1 + dy, @x2 + dx, @y2 + dy)
+  end
 end
 
 # Note: there is no need for getter methods for the non-value classes
@@ -178,6 +232,14 @@ class Let < GeometryExpression
   end
 
   ## TODO: *add* methods to this class -- do *not* change given code and do not override any methods
+  def preprocess_prog
+    Let.new(@s, @e1.preprocess_prog, @e2.preprocess_prog)
+  end
+
+  def eval_prog(env)
+    # Add to the beginning of the environment to shadow any existing binding
+    @e2.eval_prog([[@s, @e1.eval_prog(env)]] + env)
+  end
 end
 
 class Var < GeometryExpression
@@ -192,6 +254,9 @@ class Var < GeometryExpression
   end
 
   ## TODO: *add* methods to this class -- do *not* change given code and do not override any methods
+  def preprocess_prog
+    self
+  end
 end
 
 class Shift < GeometryExpression
@@ -202,4 +267,11 @@ class Shift < GeometryExpression
   end
 
   ## TODO: *add* methods to this class -- do *not* change given code and do not override any methods
+  def preprocess_prog
+    Shift.new(@dx, @dy, @e.preprocess_prog)
+  end
+
+  def eval_prog(env)
+    @e.eval_prog(env).shift(@dx, @dy)
+  end
 end

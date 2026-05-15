@@ -6,7 +6,7 @@ This component implements functional date operations using a strict set of const
  - Calendar Calculations: Calculates the number of days in a month (accounting for leap year rules), generates a list of all valid dates in a given month, and converts back and forth between a specific calendar date and its ordinal day-of-the-year number (e.g., the $n$-th day).
  - Validation: Ensures all outputs are safely wrapped in option types (Some/None) based on whether the input years, months, and days fall within valid Gregorian calendar ranges (up to the year 3000).
 
-## Inflation Data Analyzer
+## Problem 2: Inflation Data Analyzer
 
  - Data Parsing: Converts a raw string of CSV data into structured OCaml records containing a country's name, three-letter ID, and a list of yearly inflation rates (handling missing data as None).
  - Statistical Metrics: Scans a country's record using efficient tail recursion to calculate the total number of years with available data, locate the most recent available data point, and identify the years with the historical minimum and maximum inflation rates.
